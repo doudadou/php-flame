@@ -88,7 +88,7 @@ namespace fastcgi {
 	}
 	int server::accept(uv_stream_t* server) {
 		server_connection* pobj = new server_connection();
-		pobj->server_ = this;
+		pobj->svr_ = this;
 		if(unix_socket_) {
 			uv_pipe_init(flame::loop, &pobj->socket_pipe_, 0);
 		}else{
@@ -100,10 +100,7 @@ namespace fastcgi {
 		pobj->start();
 		return 0;
 	}
-	void server::on_request(server_connection* conn, php::object&& req) {
-		php::object      res = php::object::create<server_response>();
-		server_response* obj = res.native<server_response>();
-		obj->conn_ = conn;
+	void server::on_request(php::object& req, php::object& res) {
 		php::string& path = req.prop("uri");
 		if(path.is_empty()) {
 			php::fail("missing 'REQUEST_URI' in webserver config");
